@@ -142,7 +142,7 @@ def escape(d, st):
 
 if __name__ == '__main__':
     
-    inputPath = os.path.join(os.curdir, r"Datasets/ds1.txt")
+    inputPath = os.path.join(os.curdir, r"Datasets/ds10.txt")
     input = []
     
     with open(inputPath) as file:
@@ -160,9 +160,8 @@ if __name__ == '__main__':
     final_flow = escape(n, start_vertices)
     if final_flow == len(start_vertices):
         print("\n(i) YES, a solution exists.")
-        print("(ii) A solution to this problem is:")
-        printIndex = int(tc/2)
-        pos = answer[printIndex].find("->")
-        print("\t PATH from " + answer[printIndex][:answer[printIndex].find("->")] + ":  "+answer[printIndex][:-2]+"\n")
+        printStr = answer[int(final_flow/2)]
+        pos = printStr.find("->")
+        print("(ii) A solution to this problem is:\n\t PATH from " + printStr[:pos] + ":  "+printStr[:-2]+"\n")
     else:
         print("\nNO solution exists\n")
