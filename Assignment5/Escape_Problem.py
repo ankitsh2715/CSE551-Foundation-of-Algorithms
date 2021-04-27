@@ -1,10 +1,10 @@
-# Escape problem
-
 import os
 import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import breadth_first_order
 
+answer = []
+d = 0
 
 def path(arr, s, t):
     """
@@ -70,6 +70,18 @@ def edmonds_karp(G, s, t):
         flow += bottleneck_edge
         G = augment(G, shortest_path, bottleneck_edge)
         nodes, predecessor = breadth_first_order(csr_matrix(G), 0, directed=True, return_predecessors=True)
+        
+        s=""
+        for i in range(1,len(shortest_path)-1,2):
+            for x in range(1,d+1):
+                for y in range(1,d+1):
+                    if(((x-1)*2*d + (2*(y-1)+1))==shortest_path[i]):
+                        s = s + "(" + str(x) + "," + str(y) + ")" + " -> "
+                        break
+        
+        if s!="":
+            answer.append(s[:-2])
+        
         shortest_path = path(predecessor, source, sink)
 
     return flow
@@ -78,7 +90,7 @@ def edmonds_karp(G, s, t):
 def escape(d, st):
     # Total number of nodes = d * d * 2 + 2. (Num Nodes) split into in/out + source + sink
     g = d * d * 2 + 2
-    x1 = np.zeros((g, g), dtype=np.int)
+    x1 = np.zeros((g, g), dtype=int)
 
     # Vin-Vout edges changed to 1
     for j in range(1, d * d * 2, 2):
@@ -97,7 +109,8 @@ def escape(d, st):
         x1[2 * d * (j + 1)][g - 1] = 1
 
     # Source to given vertices,
-    # S to Vin
+    # add connection from Source (S) to Vertex(Vin)
+    #
     for l in st:
         x1[0][(l[0] - 1) * 2 * d + (2 * (l[1] - 1)) + 1] = 1
 
@@ -128,27 +141,28 @@ def escape(d, st):
     return max_flow
 
 if __name__ == '__main__':
-    l = []
-    file_path = os.path.join(os.curdir, r"Datasets/ds8.txt")
-    with open(file_path) as f:
-        for line in f:
-            l.append((map(int, line.strip().split())))
+    
+    inputPath = os.path.join(os.curdir, r"Datasets/ds1.txt")
+    input = []
+    
+    with open(inputPath) as file:
+        for line in file:
+            input.append((map(int, line.strip().split())))
 
-    g1, g2, tc = l[0]
-    grid_dimension = g1
-    if g1 != g2:
-        print ("Invalid Grid dimensions: Not a square grid")
+    tc, n = input[0]
+    d=n
+
+    start_vertices = []
+    for k in range(tc):
+        x, y = input[k + 1]
+        start_vertices.append((x, y))
+
+    final_flow = escape(n, start_vertices)
+    if final_flow == len(start_vertices):
+        print("\n(i) YES, a solution exists.")
+        print("(ii) A solution to this problem is:")
+        printIndex = int(tc/2)
+        pos = answer[printIndex].find("->")
+        print("\t PATH from " + answer[printIndex][:answer[printIndex].find("->")] + ":  "+answer[printIndex][:-2]+"\n")
     else:
-        start_vertices = []
-        for k in range(tc):
-            x, y = l[k + 1]
-            start_vertices.append((x, y))
-        # print start_vertices
-
-        final_flow = escape(grid_dimension, start_vertices)
-        print ("Maximum Flow: ", final_flow)
-        print ("Starting Escape vertices: ", tc)
-        if final_flow == len(start_vertices):
-            print("possible")
-        else:
-            print("not possible")
+        print("\nNO solution exists\n")
