@@ -66,6 +66,7 @@ def edmondsKarp(graph, s, t, dim):
         graph = augmentPath(graph, sPath, minCap)
         temp2, predecessor = breadth_first_order(csr_matrix(graph), 0, directed=True, return_predecessors=True)
         
+        #store escape route to print
         escapeRoute=" "
         for i in range(1,len(sPath)-1,2):
             for x in range(1,dim+1):
